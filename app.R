@@ -1,20 +1,17 @@
 install.packages(c("shiny","tidyverse","plotly","leaflet","lubridate",
-                   "prophet","shinyWidgets","bslib","scales","leaflet.extras2"))
+                   "prophet","shinyWidgets","bslib","scales","leaflet.extras2","rsconnect"))
 
-install.packages("rsconnect")
 library(rsconnect)
-
-
 library(shiny)
 library(tidyverse)
 library(plotly)
 library(leaflet)
 library(lubridate)
 
-# Load datasets (update paths if needed)
-confirmed <- read.csv("data/time_series_covid19_confirmed_global.csv")
-deaths <- read.csv("data/time_series_covid19_deaths_global.csv")
-recovered <- read.csv("data/time_series_covid19_recovered_global.csv")
+# Load datasets directly from GitHub (Raw URLs)
+confirmed <- read.csv("https://raw.githubusercontent.com/Lwazo/Covid-19/main/time_series_covid19_confirmed_global.csv")
+deaths <- read.csv("https://raw.githubusercontent.com/Lwazo/Covid-19/main/time_series_covid19_deaths_global.csv")
+recovered <- read.csv("https://raw.githubusercontent.com/Lwazo/Covid-19/main/time_series_covid19_recovered_global.csv")
 
 # Function to pivot and tidy each dataset
 tidy_covid_data <- function(df, value_name) {
@@ -53,7 +50,6 @@ ui <- fluidPage(
       selectInput("country", "Select Country:", choices = countries, selected = "South Africa"),
       dateRangeInput("dateRange", "Select Date Range:", start = date_min, end = date_max,
                      min = date_min, max = date_max),
-      # Added summary statistics panel
       wellPanel(
         h4("Summary Statistics"),
         hr(),
@@ -95,7 +91,6 @@ server <- function(input, output, session) {
       arrange(Date)
   })
   
-  # Summary statistics outputs
   output$confirmedStats <- renderText({
     data <- filtered_data()
     paste("Highest:", max(data$Confirmed, na.rm = TRUE))
@@ -110,7 +105,6 @@ server <- function(input, output, session) {
     data <- filtered_data()
     paste("Highest:", max(data$Recovered, na.rm = TRUE))
   })
-  
   
   output$confirmedPlot <- renderPlotly({
     data <- filtered_data()
@@ -139,7 +133,6 @@ server <- function(input, output, session) {
              yaxis = list(title = "Recovered"))
   })
   
-  # Map data reactive for latest date in selected range
   map_data <- reactive({
     latest_date <- max(filter(covid_data, Country.Region == input$country &
                                 Date >= input$dateRange[1] & Date <= input$dateRange[2])$Date)
@@ -175,15 +168,4 @@ server <- function(input, output, session) {
   })
 }
 
-# Run the app
 shinyApp(ui = ui, server = server)
-
-
-rsconnect::setAccountInfo(name='lwazoluhle',
-                          token='E20F39A7DBF893D6DBFF63757BBF0148',
-                          secret='<SECRET>')
-
-rsconnect::deployApp("path/to/your/app/folder")
-
-
-
