@@ -12,9 +12,9 @@ library(leaflet)
 library(lubridate)
 
 # Load datasets (update paths if needed)
-confirmed <- read.csv("time_series_covid19_confirmed_global.csv")
-deaths <- read.csv("time_series_covid19_deaths_global.csv")
-recovered <- read.csv("time_series_covid19_recovered_global.csv")
+confirmed <- read.csv("data/time_series_covid19_confirmed_global.csv")
+deaths <- read.csv("data/time_series_covid19_deaths_global.csv")
+recovered <- read.csv("data/time_series_covid19_recovered_global.csv")
 
 # Function to pivot and tidy each dataset
 tidy_covid_data <- function(df, value_name) {
@@ -184,5 +184,6 @@ rsconnect::setAccountInfo(name='lwazoluhle',
                           secret='<SECRET>')
 
 rsconnect::deployApp("path/to/your/app/folder")
+
 
 
